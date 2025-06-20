@@ -11,6 +11,7 @@ def detect_malicious_urls(log_entry):
         if not url_match:
             return False
         full_url = url_match.group(2)
+        print(f"Extracted URL: {full_url}")
     except Exception:
         return False
 
@@ -25,7 +26,9 @@ def detect_malicious_urls(log_entry):
             break
     
     # Detect encoding and convert if needed
-    detected = chardet.detect(normalized_url.encode())    if detected['encoding'] and detected['encoding'] != 'ascii':
+    detected = chardet.detect(normalized_url.encode()) 
+    print(f"Detected encoding: {detected['encoding']}, Confidence: {detected['confidence']}")   
+    if detected['encoding'] and detected['encoding'] != 'ascii':
         try:
             normalized_url = normalized_url.encode().decode(detected['encoding'])
         except:
@@ -35,10 +38,12 @@ def detect_malicious_urls(log_entry):
     try:
         parsed = urlparse(normalized_url)
         query_params = parse_qs(parsed.query)
-        
+        print(f"Parsed query parameters: {query_params}")
+        print(f"query_params: {query_params}")
         # Check for malicious destination patterns
         if 'dest' in query_params:
             dest_value = query_params['dest'][0].lower()
+            print(f"Destination value: {dest_value}")
             
             # Multi-pattern detection with normalization
             malicious_patterns = [
@@ -57,6 +62,7 @@ def detect_malicious_urls(log_entry):
         pass
 
     # Part 4: Structural analysis
+    print(f"Normalized URL: {normalized_url}")
     structural_signatures = [
         r'\.(exe|bat|cmd|js)\b',                    # Executable extensions
         r'\b(select|union|drop|alter)\b',            # SQL keywords
@@ -80,7 +86,8 @@ sample_logs = [
     '192.168.1.1 - - [15/Aug/2023:15:30:45 +0000] "POST /send?dest=u%53eR@H%41CkEr.com HTTP/1.1" 200 512',
     
     # Double encoding
-    '10.0.0.5 - - [15/Aug/2023:16:45:22 +0000] "GET /process?target=%25%36%36%25%36%36%25%36%35@bad.domain HTTP/1.1" 200 321',
+    #'10.0.0.5 - - [15/Aug/2023:16:45:22 +0000] "GET /process?target=%25%36%36%25%36%36%25%36%35@bad.domain HTTP/1.1" 200 321',
+    '10.0.0.5 - - [15/Aug/2023:16:45:22 +0000] "GET /process?dest=%25%36%36%25%36%36%25%36%35@bad.domain HTTP/1.1" 200 321',
     
     # UTF-7 obfuscation
     '203.0.113.42 - - [15/Aug/2023:17:12:33 +0000] "GET /?cmd=+AGY-+AGY-+AGU-@evil.site HTTP/1.1" 200 210',
@@ -91,4 +98,6 @@ sample_logs = [
 
 for log in sample_logs:
     result = detect_malicious_urls(log)
-    print(f"Malicious: {result}\t| {log[:60]}...")
+    print(f"Malicious: {result}\t| {log[::]}...")
+    #print newline
+    print("\n" + "="*82 + "\n")
