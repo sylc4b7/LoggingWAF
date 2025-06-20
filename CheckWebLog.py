@@ -90,7 +90,8 @@ sample_logs = [
     '10.0.0.5 - - [15/Aug/2023:16:45:22 +0000] "GET /process?dest=%25%36%36%25%36%36%25%36%35@bad.domain HTTP/1.1" 200 321',
     
     # UTF-7 obfuscation
-    '203.0.113.42 - - [15/Aug/2023:17:12:33 +0000] "GET /?cmd=+AGY-+AGY-+AGU-@evil.site HTTP/1.1" 200 210',
+    #'203.0.113.42 - - [15/Aug/2023:17:12:33 +0000] "GET /?cmd=+AGY-+AGY-+AGU-@evil.site HTTP/1.1" 200 210',
+    '203.0.113.42 - - [15/Aug/2023:17:12:33 +0000] "GET /?dest=+AGY-+AGY-+AGU-@evil.site HTTP/1.1" 200 210',
     
     # Legitimate example (should return False)
     '172.16.0.10 - - [15/Aug/2023:18:30:15 +0000] "GET /transfer?amount=100&dest=partner%40bank.com HTTP/1.1" 200 345'
